@@ -184,8 +184,10 @@ if uploaded_file:
             pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(df)}"), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
-            pdf_output = pdf.output(dest='S')
-            pdf_buffer = BytesIO(pdf_output)
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)
+
 
             base_name = os.path.splitext(uploaded_file.name)[0]
             output_name = f"{base_name}_receipt.pdf"
