@@ -57,7 +57,6 @@ if uploaded_file:
             if match:
                 dispensed_date = match.group(1)
 
-
     # ✅ استخراج الدواء والكمية والسعر من الأسطر المحددة
     lines = full_text.split("\n")
     med_list = []
@@ -66,7 +65,6 @@ if uploaded_file:
     for i in range(len(lines) - 1):
         combined_line = lines[i].strip() + " " + lines[i + 1].strip()
 
-        # استخراج رقم الدواء (1-, 2-, ...)
         match_number = re.search(r"(\d+)-\s", combined_line)
         if not match_number:
             continue
@@ -91,20 +89,21 @@ if uploaded_file:
                 else:
                     continue
 
-        # استخراج الكمية والسعر
         qty_match = re.search(r"EGP\s+\d+\.\d+\s+(\d+)", combined_line)
         price_match = re.search(r"(\d+\.\d+)\s+Box", combined_line)
 
-        qty = float(qty_match.group(1)) if qty_match else 1.0
+        qty = float(qty_match.group(1)) if qty_match else 0.0
         unit_price = float(price_match.group(1)) if price_match else 0.0
         total_price = round(qty * unit_price, 2)
 
-        med_list.append({
-            "اسم الصنف": med_name,
-            "الكمية": qty,
-            "سعر الوحدة": unit_price,
-            "سعر الكمية": total_price
-        })
+        # ✅ استبعاد الدواء إذا كانت الكمية = 0
+        if qty > 0:
+            med_list.append({
+                "اسم الصنف": med_name,
+                "الكمية": qty,
+                "سعر الوحدة": unit_price,
+                "سعر الكمية": total_price
+            })
 
     # 🟩 عرض النتائج
     if med_list:
@@ -149,7 +148,7 @@ if uploaded_file:
             pdf.add_page()
             pdf.set_font("Amiri", "", 11)
 
-            pdf.cell(0, 10,reshape_arabic(client_name) + reshape_arabic("اسم العميل: ") , ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic(client_name) + reshape_arabic("اسم العميل: "), ln=1, align="R")
             pdf.cell(0, 10, reshape_arabic("التاريخ: " + dispensed_date), ln=1, align="R")
             pdf.ln(5)
 
