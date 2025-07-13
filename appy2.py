@@ -131,7 +131,7 @@ if uploaded_file:
                     self.set_fill_color(230, 230, 230)
                     self.image("logo.png", x=10, y=8, w=20)
                     self.set_font("Amiri", "B", 14)
-                    self.cell(0, 10, reshape_arabic("صيدلية د/ نادر نبيل فهمي), ln=1, align="C")
+                    self.cell(0, 10, reshape_arabic("صيدلية د/ نادر نبيل فهمي"), ln=1, align="C")
                     self.set_font("Amiri", "", 11)
                     self.cell(0, 10, reshape_arabic("م.ض: 5-00591-181-40-01"), ln=1, align="C")
                     self.cell(0, 10, reshape_arabic("س.ت: 94294"), ln=1, align="C")
