@@ -108,12 +108,25 @@ if uploaded_file:
     # 🟩 عرض النتائج
     if med_list:
         df = pd.DataFrame(med_list)
-        st.subheader("📋 جدول الأدوية المستخرجة:")
-        st.dataframe(df)
+        st.subheader("📋 جدول الأدوية المستخرجة (قابل للتعديل):")
+        edited_df = st.data_editor(
+            df,
+            column_config={
+                "اسم الصنف": st.column_config.TextColumn("اسم الصنف"),
+                "الكمية": st.column_config.NumberColumn("الكمية"),
+                "سعر الوحدة": st.column_config.NumberColumn("سعر الوحدة"),
+                "سعر الكمية": st.column_config.NumberColumn("سعر الكمية"),
+            },
+            num_rows="fixed",
+            use_container_width=True
+        )
+
+        # ✅ إعادة حساب "سعر الكمية" تلقائيًا بعد التعديل
+        edited_df["سعر الكمية"] = edited_df["الكمية"] * edited_df["سعر الوحدة"]
 
         # زر تحميل Excel
         output = BytesIO()
-        df.to_excel(output, index=False)
+        edited_df.to_excel(output, index=False)
         output.seek(0)
         st.download_button(
             label="⬇️ تحميل Excel",
@@ -170,7 +183,7 @@ if uploaded_file:
 
             draw_table_header()
 
-            for index, row in df.iterrows():
+            for index, row in edited_df.iterrows():
                 if row_count >= rows_per_page:
                     pdf.add_page()
                     draw_table_header()
@@ -184,8 +197,8 @@ if uploaded_file:
                 row_count += 1
 
             pdf.ln(5)
-            pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(df)}"), ln=1, align="R")
-            pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic(f"عدد الأصناف: {len(edited_df)}"), ln=1, align="R")
+            pdf.cell(0, 10, reshape_arabic(f"الإجمالي: {edited_df['سعر الكمية'].sum():.2f} EGP"), ln=1, align="R")
 
             pdf_output = pdf.output(dest='S')
             if isinstance(pdf_output, str):
